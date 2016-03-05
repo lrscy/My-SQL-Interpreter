@@ -1,0 +1,1467 @@
+Grammar
+
+    0 $accept: sql $end
+
+    1 sql: base_table_define
+    2    | drop_statement
+    3    | select_statement
+    4    | insert_statement
+    5    | update_statement
+    6    | delete_statement
+    7    | QUIT
+    8    | help_statement
+
+    9 help_statement: HELP
+
+   10 base_table_define: CREATE TABLE table '(' base_table_element_list ')'
+
+   11 table: NAME
+   12      | NAME '.' NAME
+
+   13 base_table_element_list: base_table_element
+   14                        | base_table_element_list ',' base_table_element
+
+   15 base_table_element: column_define
+
+   16 column_define: column data_type
+
+   17 column: NAME
+
+   18 data_type: INT
+   19          | DOUBLE
+   20          | STRING
+
+   21 drop_statement: DROP TABLE table
+
+   22 select_statement: SELECT selection table_extend
+
+   23 selection: '*'
+   24          | scalar_extend_list
+
+   25 scalar_extend_list: scalar_extend
+   26                   | scalar_extend_list ',' scalar_extend
+
+   27 scalar_extend: scalar_extend '+' scalar_extend
+   28              | scalar_extend '-' scalar_extend
+   29              | scalar_extend '*' scalar_extend
+   30              | scalar_extend '/' scalar_extend
+   31              | '(' scalar_extend ')'
+   32              | atom
+   33              | column_var
+
+   34 atom: literal
+
+   35 literal: INTVAL
+   36        | DOUBLEVAL
+   37        | STRINGVAL
+
+   38 column_var: NAME
+   39           | NAME '.' NAME
+
+   40 table_extend: from_clause opt_where_clause
+
+   41 from_clause: FROM table_reference_list
+
+   42 table_reference_list: table_reference
+   43                     | table_reference_list ',' table_reference
+
+   44 table_reference: table
+
+   45 opt_where_clause: /* empty */
+   46                 | where_clause
+
+   47 where_clause: WHERE search_condition
+
+   48 search_condition: search_condition OR search_condition
+   49                 | search_condition AND search_condition
+   50                 | NOT search_condition
+   51                 | '(' search_condition ')'
+   52                 | predicate
+
+   53 predicate: comparison_predicate
+
+   54 comparison_predicate: scalar_extend COMPARISON scalar_extend
+
+   55 insert_statement: INSERT INTO table opt_column_list values_or_query
+
+   56 opt_column_list: /* empty */
+   57                | '(' column_list ')'
+
+   58 column_list: column
+   59            | column_list ',' column
+
+   60 values_or_query: VALUES '(' insert_atom_list ')'
+
+   61 insert_atom_list: insert_atom
+   62                 | insert_atom_list ',' insert_atom
+
+   63 insert_atom: atom
+   64            | NULLX
+
+   65 update_statement: UPDATE table SET assignment_list opt_where_clause
+
+   66 assignment_list: assignment
+   67                | assignment_list ',' assignment
+
+   68 assignment: column COMPARISON scalar_extend
+   69           | column COMPARISON NULLX
+
+   70 delete_statement: DELETE FROM table opt_where_clause
+
+
+Terminals, with rules where they appear
+
+$end (0) 0
+'(' (40) 10 31 51 57 60
+')' (41) 10 31 51 57 60
+'*' (42) 23 29
+'+' (43) 27
+',' (44) 14 26 43 59 62 67
+'-' (45) 28
+'.' (46) 12 39
+'/' (47) 30
+error (256)
+HELP (258) 9
+QUIT (259) 7
+CREATE (260) 10
+TABLE (261) 10 21
+DROP (262) 21
+SELECT (263) 22
+FROM (264) 41 70
+WHERE (265) 47
+INSERT (266) 55
+INTO (267) 55
+VALUES (268) 60
+UPDATE (269) 65
+SET (270) 65
+DELETE (271) 70
+NAME (272) 11 12 17 38 39
+INTVAL (273) 35
+DOUBLEVAL (274) 36
+STRINGVAL (275) 37
+INT (276) 18
+DOUBLE (277) 19
+STRING (278) 20
+NULLX (279) 64 69
+COMPARISON (280) 54 68 69
+OR (281) 48
+AND (282) 49
+NOT (283) 50
+
+
+Nonterminals, with rules where they appear
+
+$accept (37)
+    on left: 0
+sql (38)
+    on left: 1 2 3 4 5 6 7 8, on right: 0
+help_statement (39)
+    on left: 9, on right: 8
+base_table_define (40)
+    on left: 10, on right: 1
+table (41)
+    on left: 11 12, on right: 10 21 44 55 65 70
+base_table_element_list (42)
+    on left: 13 14, on right: 10 14
+base_table_element (43)
+    on left: 15, on right: 13 14
+column_define (44)
+    on left: 16, on right: 15
+column (45)
+    on left: 17, on right: 16 58 59 68 69
+data_type (46)
+    on left: 18 19 20, on right: 16
+drop_statement (47)
+    on left: 21, on right: 2
+select_statement (48)
+    on left: 22, on right: 3
+selection (49)
+    on left: 23 24, on right: 22
+scalar_extend_list (50)
+    on left: 25 26, on right: 24 26
+scalar_extend (51)
+    on left: 27 28 29 30 31 32 33, on right: 25 26 27 28 29 30 31 54
+    68
+atom (52)
+    on left: 34, on right: 32 63
+literal (53)
+    on left: 35 36 37, on right: 34
+column_var (54)
+    on left: 38 39, on right: 33
+table_extend (55)
+    on left: 40, on right: 22
+from_clause (56)
+    on left: 41, on right: 40
+table_reference_list (57)
+    on left: 42 43, on right: 41 43
+table_reference (58)
+    on left: 44, on right: 42 43
+opt_where_clause (59)
+    on left: 45 46, on right: 40 65 70
+where_clause (60)
+    on left: 47, on right: 46
+search_condition (61)
+    on left: 48 49 50 51 52, on right: 47 48 49 50 51
+predicate (62)
+    on left: 53, on right: 52
+comparison_predicate (63)
+    on left: 54, on right: 53
+insert_statement (64)
+    on left: 55, on right: 4
+opt_column_list (65)
+    on left: 56 57, on right: 55
+column_list (66)
+    on left: 58 59, on right: 57 59
+values_or_query (67)
+    on left: 60, on right: 55
+insert_atom_list (68)
+    on left: 61 62, on right: 60 62
+insert_atom (69)
+    on left: 63 64, on right: 61 62
+update_statement (70)
+    on left: 65, on right: 5
+assignment_list (71)
+    on left: 66 67, on right: 65 67
+assignment (72)
+    on left: 68 69, on right: 66 67
+delete_statement (73)
+    on left: 70, on right: 6
+
+
+state 0
+
+    0 $accept: . sql $end
+
+    HELP    shift, and go to state 1
+    QUIT    shift, and go to state 2
+    CREATE  shift, and go to state 3
+    DROP    shift, and go to state 4
+    SELECT  shift, and go to state 5
+    INSERT  shift, and go to state 6
+    UPDATE  shift, and go to state 7
+    DELETE  shift, and go to state 8
+
+    sql                go to state 9
+    help_statement     go to state 10
+    base_table_define  go to state 11
+    drop_statement     go to state 12
+    select_statement   go to state 13
+    insert_statement   go to state 14
+    update_statement   go to state 15
+    delete_statement   go to state 16
+
+
+state 1
+
+    9 help_statement: HELP .
+
+    $default  reduce using rule 9 (help_statement)
+
+
+state 2
+
+    7 sql: QUIT .
+
+    $default  reduce using rule 7 (sql)
+
+
+state 3
+
+   10 base_table_define: CREATE . TABLE table '(' base_table_element_list ')'
+
+    TABLE  shift, and go to state 17
+
+
+state 4
+
+   21 drop_statement: DROP . TABLE table
+
+    TABLE  shift, and go to state 18
+
+
+state 5
+
+   22 select_statement: SELECT . selection table_extend
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+    '*'        shift, and go to state 24
+
+    selection           go to state 25
+    scalar_extend_list  go to state 26
+    scalar_extend       go to state 27
+    atom                go to state 28
+    literal             go to state 29
+    column_var          go to state 30
+
+
+state 6
+
+   55 insert_statement: INSERT . INTO table opt_column_list values_or_query
+
+    INTO  shift, and go to state 31
+
+
+state 7
+
+   65 update_statement: UPDATE . table SET assignment_list opt_where_clause
+
+    NAME  shift, and go to state 32
+
+    table  go to state 33
+
+
+state 8
+
+   70 delete_statement: DELETE . FROM table opt_where_clause
+
+    FROM  shift, and go to state 34
+
+
+state 9
+
+    0 $accept: sql . $end
+
+    $end  shift, and go to state 35
+
+
+state 10
+
+    8 sql: help_statement .
+
+    $default  reduce using rule 8 (sql)
+
+
+state 11
+
+    1 sql: base_table_define .
+
+    $default  reduce using rule 1 (sql)
+
+
+state 12
+
+    2 sql: drop_statement .
+
+    $default  reduce using rule 2 (sql)
+
+
+state 13
+
+    3 sql: select_statement .
+
+    $default  reduce using rule 3 (sql)
+
+
+state 14
+
+    4 sql: insert_statement .
+
+    $default  reduce using rule 4 (sql)
+
+
+state 15
+
+    5 sql: update_statement .
+
+    $default  reduce using rule 5 (sql)
+
+
+state 16
+
+    6 sql: delete_statement .
+
+    $default  reduce using rule 6 (sql)
+
+
+state 17
+
+   10 base_table_define: CREATE TABLE . table '(' base_table_element_list ')'
+
+    NAME  shift, and go to state 32
+
+    table  go to state 36
+
+
+state 18
+
+   21 drop_statement: DROP TABLE . table
+
+    NAME  shift, and go to state 32
+
+    table  go to state 37
+
+
+state 19
+
+   38 column_var: NAME .
+   39           | NAME . '.' NAME
+
+    '.'  shift, and go to state 38
+
+    $default  reduce using rule 38 (column_var)
+
+
+state 20
+
+   35 literal: INTVAL .
+
+    $default  reduce using rule 35 (literal)
+
+
+state 21
+
+   36 literal: DOUBLEVAL .
+
+    $default  reduce using rule 36 (literal)
+
+
+state 22
+
+   37 literal: STRINGVAL .
+
+    $default  reduce using rule 37 (literal)
+
+
+state 23
+
+   31 scalar_extend: '(' . scalar_extend ')'
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 39
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 24
+
+   23 selection: '*' .
+
+    $default  reduce using rule 23 (selection)
+
+
+state 25
+
+   22 select_statement: SELECT selection . table_extend
+
+    FROM  shift, and go to state 40
+
+    table_extend  go to state 41
+    from_clause   go to state 42
+
+
+state 26
+
+   24 selection: scalar_extend_list .
+   26 scalar_extend_list: scalar_extend_list . ',' scalar_extend
+
+    ','  shift, and go to state 43
+
+    $default  reduce using rule 24 (selection)
+
+
+state 27
+
+   25 scalar_extend_list: scalar_extend .
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+
+    '+'  shift, and go to state 44
+    '-'  shift, and go to state 45
+    '*'  shift, and go to state 46
+    '/'  shift, and go to state 47
+
+    $default  reduce using rule 25 (scalar_extend_list)
+
+
+state 28
+
+   32 scalar_extend: atom .
+
+    $default  reduce using rule 32 (scalar_extend)
+
+
+state 29
+
+   34 atom: literal .
+
+    $default  reduce using rule 34 (atom)
+
+
+state 30
+
+   33 scalar_extend: column_var .
+
+    $default  reduce using rule 33 (scalar_extend)
+
+
+state 31
+
+   55 insert_statement: INSERT INTO . table opt_column_list values_or_query
+
+    NAME  shift, and go to state 32
+
+    table  go to state 48
+
+
+state 32
+
+   11 table: NAME .
+   12      | NAME . '.' NAME
+
+    '.'  shift, and go to state 49
+
+    $default  reduce using rule 11 (table)
+
+
+state 33
+
+   65 update_statement: UPDATE table . SET assignment_list opt_where_clause
+
+    SET  shift, and go to state 50
+
+
+state 34
+
+   70 delete_statement: DELETE FROM . table opt_where_clause
+
+    NAME  shift, and go to state 32
+
+    table  go to state 51
+
+
+state 35
+
+    0 $accept: sql $end .
+
+    $default  accept
+
+
+state 36
+
+   10 base_table_define: CREATE TABLE table . '(' base_table_element_list ')'
+
+    '('  shift, and go to state 52
+
+
+state 37
+
+   21 drop_statement: DROP TABLE table .
+
+    $default  reduce using rule 21 (drop_statement)
+
+
+state 38
+
+   39 column_var: NAME '.' . NAME
+
+    NAME  shift, and go to state 53
+
+
+state 39
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+   31              | '(' scalar_extend . ')'
+
+    ')'  shift, and go to state 54
+    '+'  shift, and go to state 44
+    '-'  shift, and go to state 45
+    '*'  shift, and go to state 46
+    '/'  shift, and go to state 47
+
+
+state 40
+
+   41 from_clause: FROM . table_reference_list
+
+    NAME  shift, and go to state 32
+
+    table                 go to state 55
+    table_reference_list  go to state 56
+    table_reference       go to state 57
+
+
+state 41
+
+   22 select_statement: SELECT selection table_extend .
+
+    $default  reduce using rule 22 (select_statement)
+
+
+state 42
+
+   40 table_extend: from_clause . opt_where_clause
+
+    WHERE  shift, and go to state 58
+
+    $default  reduce using rule 45 (opt_where_clause)
+
+    opt_where_clause  go to state 59
+    where_clause      go to state 60
+
+
+state 43
+
+   26 scalar_extend_list: scalar_extend_list ',' . scalar_extend
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 61
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 44
+
+   27 scalar_extend: scalar_extend '+' . scalar_extend
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 62
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 45
+
+   28 scalar_extend: scalar_extend '-' . scalar_extend
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 63
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 46
+
+   29 scalar_extend: scalar_extend '*' . scalar_extend
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 64
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 47
+
+   30 scalar_extend: scalar_extend '/' . scalar_extend
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 65
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 48
+
+   55 insert_statement: INSERT INTO table . opt_column_list values_or_query
+
+    '('  shift, and go to state 66
+
+    $default  reduce using rule 56 (opt_column_list)
+
+    opt_column_list  go to state 67
+
+
+state 49
+
+   12 table: NAME '.' . NAME
+
+    NAME  shift, and go to state 68
+
+
+state 50
+
+   65 update_statement: UPDATE table SET . assignment_list opt_where_clause
+
+    NAME  shift, and go to state 69
+
+    column           go to state 70
+    assignment_list  go to state 71
+    assignment       go to state 72
+
+
+state 51
+
+   70 delete_statement: DELETE FROM table . opt_where_clause
+
+    WHERE  shift, and go to state 58
+
+    $default  reduce using rule 45 (opt_where_clause)
+
+    opt_where_clause  go to state 73
+    where_clause      go to state 60
+
+
+state 52
+
+   10 base_table_define: CREATE TABLE table '(' . base_table_element_list ')'
+
+    NAME  shift, and go to state 69
+
+    base_table_element_list  go to state 74
+    base_table_element       go to state 75
+    column_define            go to state 76
+    column                   go to state 77
+
+
+state 53
+
+   39 column_var: NAME '.' NAME .
+
+    $default  reduce using rule 39 (column_var)
+
+
+state 54
+
+   31 scalar_extend: '(' scalar_extend ')' .
+
+    $default  reduce using rule 31 (scalar_extend)
+
+
+state 55
+
+   44 table_reference: table .
+
+    $default  reduce using rule 44 (table_reference)
+
+
+state 56
+
+   41 from_clause: FROM table_reference_list .
+   43 table_reference_list: table_reference_list . ',' table_reference
+
+    ','  shift, and go to state 78
+
+    $default  reduce using rule 41 (from_clause)
+
+
+state 57
+
+   42 table_reference_list: table_reference .
+
+    $default  reduce using rule 42 (table_reference_list)
+
+
+state 58
+
+   47 where_clause: WHERE . search_condition
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 79
+    NOT        shift, and go to state 80
+
+    scalar_extend         go to state 81
+    atom                  go to state 28
+    literal               go to state 29
+    column_var            go to state 30
+    search_condition      go to state 82
+    predicate             go to state 83
+    comparison_predicate  go to state 84
+
+
+state 59
+
+   40 table_extend: from_clause opt_where_clause .
+
+    $default  reduce using rule 40 (table_extend)
+
+
+state 60
+
+   46 opt_where_clause: where_clause .
+
+    $default  reduce using rule 46 (opt_where_clause)
+
+
+state 61
+
+   26 scalar_extend_list: scalar_extend_list ',' scalar_extend .
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+
+    '+'  shift, and go to state 44
+    '-'  shift, and go to state 45
+    '*'  shift, and go to state 46
+    '/'  shift, and go to state 47
+
+    $default  reduce using rule 26 (scalar_extend_list)
+
+
+state 62
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   27              | scalar_extend '+' scalar_extend .
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+
+    '*'  shift, and go to state 46
+    '/'  shift, and go to state 47
+
+    $default  reduce using rule 27 (scalar_extend)
+
+
+state 63
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   28              | scalar_extend '-' scalar_extend .
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+
+    '*'  shift, and go to state 46
+    '/'  shift, and go to state 47
+
+    $default  reduce using rule 28 (scalar_extend)
+
+
+state 64
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   29              | scalar_extend '*' scalar_extend .
+   30              | scalar_extend . '/' scalar_extend
+
+    $default  reduce using rule 29 (scalar_extend)
+
+
+state 65
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+   30              | scalar_extend '/' scalar_extend .
+
+    $default  reduce using rule 30 (scalar_extend)
+
+
+state 66
+
+   57 opt_column_list: '(' . column_list ')'
+
+    NAME  shift, and go to state 69
+
+    column       go to state 85
+    column_list  go to state 86
+
+
+state 67
+
+   55 insert_statement: INSERT INTO table opt_column_list . values_or_query
+
+    VALUES  shift, and go to state 87
+
+    values_or_query  go to state 88
+
+
+state 68
+
+   12 table: NAME '.' NAME .
+
+    $default  reduce using rule 12 (table)
+
+
+state 69
+
+   17 column: NAME .
+
+    $default  reduce using rule 17 (column)
+
+
+state 70
+
+   68 assignment: column . COMPARISON scalar_extend
+   69           | column . COMPARISON NULLX
+
+    COMPARISON  shift, and go to state 89
+
+
+state 71
+
+   65 update_statement: UPDATE table SET assignment_list . opt_where_clause
+   67 assignment_list: assignment_list . ',' assignment
+
+    WHERE  shift, and go to state 58
+    ','    shift, and go to state 90
+
+    $default  reduce using rule 45 (opt_where_clause)
+
+    opt_where_clause  go to state 91
+    where_clause      go to state 60
+
+
+state 72
+
+   66 assignment_list: assignment .
+
+    $default  reduce using rule 66 (assignment_list)
+
+
+state 73
+
+   70 delete_statement: DELETE FROM table opt_where_clause .
+
+    $default  reduce using rule 70 (delete_statement)
+
+
+state 74
+
+   10 base_table_define: CREATE TABLE table '(' base_table_element_list . ')'
+   14 base_table_element_list: base_table_element_list . ',' base_table_element
+
+    ','  shift, and go to state 92
+    ')'  shift, and go to state 93
+
+
+state 75
+
+   13 base_table_element_list: base_table_element .
+
+    $default  reduce using rule 13 (base_table_element_list)
+
+
+state 76
+
+   15 base_table_element: column_define .
+
+    $default  reduce using rule 15 (base_table_element)
+
+
+state 77
+
+   16 column_define: column . data_type
+
+    INT     shift, and go to state 94
+    DOUBLE  shift, and go to state 95
+    STRING  shift, and go to state 96
+
+    data_type  go to state 97
+
+
+state 78
+
+   43 table_reference_list: table_reference_list ',' . table_reference
+
+    NAME  shift, and go to state 32
+
+    table            go to state 55
+    table_reference  go to state 98
+
+
+state 79
+
+   31 scalar_extend: '(' . scalar_extend ')'
+   51 search_condition: '(' . search_condition ')'
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 79
+    NOT        shift, and go to state 80
+
+    scalar_extend         go to state 99
+    atom                  go to state 28
+    literal               go to state 29
+    column_var            go to state 30
+    search_condition      go to state 100
+    predicate             go to state 83
+    comparison_predicate  go to state 84
+
+
+state 80
+
+   50 search_condition: NOT . search_condition
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 79
+    NOT        shift, and go to state 80
+
+    scalar_extend         go to state 81
+    atom                  go to state 28
+    literal               go to state 29
+    column_var            go to state 30
+    search_condition      go to state 101
+    predicate             go to state 83
+    comparison_predicate  go to state 84
+
+
+state 81
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+   54 comparison_predicate: scalar_extend . COMPARISON scalar_extend
+
+    COMPARISON  shift, and go to state 102
+    '+'         shift, and go to state 44
+    '-'         shift, and go to state 45
+    '*'         shift, and go to state 46
+    '/'         shift, and go to state 47
+
+
+state 82
+
+   47 where_clause: WHERE search_condition .
+   48 search_condition: search_condition . OR search_condition
+   49                 | search_condition . AND search_condition
+
+    OR   shift, and go to state 103
+    AND  shift, and go to state 104
+
+    $default  reduce using rule 47 (where_clause)
+
+
+state 83
+
+   52 search_condition: predicate .
+
+    $default  reduce using rule 52 (search_condition)
+
+
+state 84
+
+   53 predicate: comparison_predicate .
+
+    $default  reduce using rule 53 (predicate)
+
+
+state 85
+
+   58 column_list: column .
+
+    $default  reduce using rule 58 (column_list)
+
+
+state 86
+
+   57 opt_column_list: '(' column_list . ')'
+   59 column_list: column_list . ',' column
+
+    ','  shift, and go to state 105
+    ')'  shift, and go to state 106
+
+
+state 87
+
+   60 values_or_query: VALUES . '(' insert_atom_list ')'
+
+    '('  shift, and go to state 107
+
+
+state 88
+
+   55 insert_statement: INSERT INTO table opt_column_list values_or_query .
+
+    $default  reduce using rule 55 (insert_statement)
+
+
+state 89
+
+   68 assignment: column COMPARISON . scalar_extend
+   69           | column COMPARISON . NULLX
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    NULLX      shift, and go to state 108
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 109
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 90
+
+   67 assignment_list: assignment_list ',' . assignment
+
+    NAME  shift, and go to state 69
+
+    column      go to state 70
+    assignment  go to state 110
+
+
+state 91
+
+   65 update_statement: UPDATE table SET assignment_list opt_where_clause .
+
+    $default  reduce using rule 65 (update_statement)
+
+
+state 92
+
+   14 base_table_element_list: base_table_element_list ',' . base_table_element
+
+    NAME  shift, and go to state 69
+
+    base_table_element  go to state 111
+    column_define       go to state 76
+    column              go to state 77
+
+
+state 93
+
+   10 base_table_define: CREATE TABLE table '(' base_table_element_list ')' .
+
+    $default  reduce using rule 10 (base_table_define)
+
+
+state 94
+
+   18 data_type: INT .
+
+    $default  reduce using rule 18 (data_type)
+
+
+state 95
+
+   19 data_type: DOUBLE .
+
+    $default  reduce using rule 19 (data_type)
+
+
+state 96
+
+   20 data_type: STRING .
+
+    $default  reduce using rule 20 (data_type)
+
+
+state 97
+
+   16 column_define: column data_type .
+
+    $default  reduce using rule 16 (column_define)
+
+
+state 98
+
+   43 table_reference_list: table_reference_list ',' table_reference .
+
+    $default  reduce using rule 43 (table_reference_list)
+
+
+state 99
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+   31              | '(' scalar_extend . ')'
+   54 comparison_predicate: scalar_extend . COMPARISON scalar_extend
+
+    COMPARISON  shift, and go to state 102
+    ')'         shift, and go to state 54
+    '+'         shift, and go to state 44
+    '-'         shift, and go to state 45
+    '*'         shift, and go to state 46
+    '/'         shift, and go to state 47
+
+
+state 100
+
+   48 search_condition: search_condition . OR search_condition
+   49                 | search_condition . AND search_condition
+   51                 | '(' search_condition . ')'
+
+    ')'  shift, and go to state 112
+    OR   shift, and go to state 103
+    AND  shift, and go to state 104
+
+
+state 101
+
+   48 search_condition: search_condition . OR search_condition
+   49                 | search_condition . AND search_condition
+   50                 | NOT search_condition .
+
+    $default  reduce using rule 50 (search_condition)
+
+
+state 102
+
+   54 comparison_predicate: scalar_extend COMPARISON . scalar_extend
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 23
+
+    scalar_extend  go to state 113
+    atom           go to state 28
+    literal        go to state 29
+    column_var     go to state 30
+
+
+state 103
+
+   48 search_condition: search_condition OR . search_condition
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 79
+    NOT        shift, and go to state 80
+
+    scalar_extend         go to state 81
+    atom                  go to state 28
+    literal               go to state 29
+    column_var            go to state 30
+    search_condition      go to state 114
+    predicate             go to state 83
+    comparison_predicate  go to state 84
+
+
+state 104
+
+   49 search_condition: search_condition AND . search_condition
+
+    NAME       shift, and go to state 19
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    '('        shift, and go to state 79
+    NOT        shift, and go to state 80
+
+    scalar_extend         go to state 81
+    atom                  go to state 28
+    literal               go to state 29
+    column_var            go to state 30
+    search_condition      go to state 115
+    predicate             go to state 83
+    comparison_predicate  go to state 84
+
+
+state 105
+
+   59 column_list: column_list ',' . column
+
+    NAME  shift, and go to state 69
+
+    column  go to state 116
+
+
+state 106
+
+   57 opt_column_list: '(' column_list ')' .
+
+    $default  reduce using rule 57 (opt_column_list)
+
+
+state 107
+
+   60 values_or_query: VALUES '(' . insert_atom_list ')'
+
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    NULLX      shift, and go to state 117
+
+    atom              go to state 118
+    literal           go to state 29
+    insert_atom_list  go to state 119
+    insert_atom       go to state 120
+
+
+state 108
+
+   69 assignment: column COMPARISON NULLX .
+
+    $default  reduce using rule 69 (assignment)
+
+
+state 109
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+   68 assignment: column COMPARISON scalar_extend .
+
+    '+'  shift, and go to state 44
+    '-'  shift, and go to state 45
+    '*'  shift, and go to state 46
+    '/'  shift, and go to state 47
+
+    $default  reduce using rule 68 (assignment)
+
+
+state 110
+
+   67 assignment_list: assignment_list ',' assignment .
+
+    $default  reduce using rule 67 (assignment_list)
+
+
+state 111
+
+   14 base_table_element_list: base_table_element_list ',' base_table_element .
+
+    $default  reduce using rule 14 (base_table_element_list)
+
+
+state 112
+
+   51 search_condition: '(' search_condition ')' .
+
+    $default  reduce using rule 51 (search_condition)
+
+
+state 113
+
+   27 scalar_extend: scalar_extend . '+' scalar_extend
+   28              | scalar_extend . '-' scalar_extend
+   29              | scalar_extend . '*' scalar_extend
+   30              | scalar_extend . '/' scalar_extend
+   54 comparison_predicate: scalar_extend COMPARISON scalar_extend .
+
+    '+'  shift, and go to state 44
+    '-'  shift, and go to state 45
+    '*'  shift, and go to state 46
+    '/'  shift, and go to state 47
+
+    $default  reduce using rule 54 (comparison_predicate)
+
+
+state 114
+
+   48 search_condition: search_condition . OR search_condition
+   48                 | search_condition OR search_condition .
+   49                 | search_condition . AND search_condition
+
+    AND  shift, and go to state 104
+
+    $default  reduce using rule 48 (search_condition)
+
+
+state 115
+
+   48 search_condition: search_condition . OR search_condition
+   49                 | search_condition . AND search_condition
+   49                 | search_condition AND search_condition .
+
+    $default  reduce using rule 49 (search_condition)
+
+
+state 116
+
+   59 column_list: column_list ',' column .
+
+    $default  reduce using rule 59 (column_list)
+
+
+state 117
+
+   64 insert_atom: NULLX .
+
+    $default  reduce using rule 64 (insert_atom)
+
+
+state 118
+
+   63 insert_atom: atom .
+
+    $default  reduce using rule 63 (insert_atom)
+
+
+state 119
+
+   60 values_or_query: VALUES '(' insert_atom_list . ')'
+   62 insert_atom_list: insert_atom_list . ',' insert_atom
+
+    ','  shift, and go to state 121
+    ')'  shift, and go to state 122
+
+
+state 120
+
+   61 insert_atom_list: insert_atom .
+
+    $default  reduce using rule 61 (insert_atom_list)
+
+
+state 121
+
+   62 insert_atom_list: insert_atom_list ',' . insert_atom
+
+    INTVAL     shift, and go to state 20
+    DOUBLEVAL  shift, and go to state 21
+    STRINGVAL  shift, and go to state 22
+    NULLX      shift, and go to state 117
+
+    atom         go to state 118
+    literal      go to state 29
+    insert_atom  go to state 123
+
+
+state 122
+
+   60 values_or_query: VALUES '(' insert_atom_list ')' .
+
+    $default  reduce using rule 60 (values_or_query)
+
+
+state 123
+
+   62 insert_atom_list: insert_atom_list ',' insert_atom .
+
+    $default  reduce using rule 62 (insert_atom_list)
